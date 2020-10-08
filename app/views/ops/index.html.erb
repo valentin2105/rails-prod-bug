@@ -1,0 +1,72 @@
+<h2>Operation Center</h2>
+
+<hr>
+
+
+
+
+<% alerts = get_mmonit_alerts() %>
+<% if (alerts != []) and (alerts != nil) then %>
+<br>
+<h3><a href="https://<%= @mmonit_url %>">M/Monit</a> Alerts</h3>
+<div class="table-responsive-xl">
+    <table class="table  table-striped table-bordered table-hover text-nowrap">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">Hostname</th>
+                <th scope="col">Service</th>
+                <th scope="col">Event</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% for alert in alerts %>
+            <tr>
+                <td><%= alert["hostname"] %></td>
+
+                <td><%= alert["servicename"] %></td>
+                <td><%= alert["event"] %></td>
+            </tr>
+            <% end %>
+        </tbody>
+    </table>
+</div>
+<hr>
+<% end %>
+
+<% if (@rundeckExec != []) and (@rundeckExec != nil) then %>
+<h3><%= link_to @rundeck_url, target: :_blank do %>Rundeck <% end %>
+    jobs
+    (<%= @rundeckExec["count"] %>)
+</h3>
+
+<div class="table-responsive-xl">
+    <table class="table  table-striped table-bordered table-hover text-nowrap">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Since</th>
+                <th scope="col">Link</th>
+            </tr>
+        </thead>
+        <tbody>
+           
+            <% if @rundeckExec["execution"] != nil %>
+                <% for execu in @rundeckExec["execution"] %>
+                <tr>
+                   
+                        <td><%=execu["job"]["name"]%></td>
+                        <td><%=distance_of_time_in_words(execu["date_started"]["__content__"], Time.now)%></td>
+                        <td><a class="btn btn-primary" href="<%=execu["href"]%>">Show</a></td>
+                        <%# <td><%= debug execu</td> %>
+
+            <% end %>
+
+
+                </tr>
+                <% end %>
+        </tbody>
+    </table>
+</div>
+<% end %>
+
+

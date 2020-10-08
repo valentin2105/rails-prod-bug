@@ -1,0 +1,34 @@
+<%= form_for(resource, as: resource_name, :html => {:class => 'form-signin '}, url: session_path(resource_name)) do |f| %>
+<div class="text-center mb-4">
+
+    <h2>Se connecter</h2>
+
+    </br>
+
+    <div class="form-group">
+        <div class="field form-label-group">
+            <%= f.email_field :email, autofocus: true, autocomplete: "email", class: "form-control"  %>
+            <label for="inputEmail">E-mail</label>
+        </div>
+
+        <div class="field form-label-group">
+            <%= f.password_field :password, autocomplete: "current-password", class: "form-control"  %>
+            <label for="inputPassword">Password</label>
+        </div>
+
+        <% if devise_mapping.rememberable? %>
+        <div class="field checkbox mb-3">
+            <%= f.check_box :remember_me  %>
+            <%= f.label :Restez_connecté %>
+        </div>
+        <% end %>
+        
+        <div class="actions form-actions">
+            <%= f.submit "Se connecter",  class: "btn btn-large btn-primary" %>
+        </div>
+        </br>
+        <%= render "devise/shared/links" %>
+
+    </div>
+</div>
+<% end %>

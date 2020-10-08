@@ -1,0 +1,208 @@
+<% if (@vms != nil) then %>
+    <% for vm in @vms %>
+        <% @status = get_vm_status(vm[:custom_fields].to_h[@cf_vmid].to_s)%>
+        <div class="container-global">
+            <div class="container-status">
+                <h2 class="title-show">Virtual Machine</h2>
+               
+                <!--Dropdown Tools -->
+                <div class="btn-group dropdown">
+                 <%# Name virtual machine %>
+                <h1 id="vmname"><pre><%= vm.name %></pre></h1>
+                    <button class="btn dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                    <div class="dropdown-menu" >
+                        <a class="btn dropdown-item"<% path = "/edit/" + vm.id.to_s %><%= link_to "Modifier la vm", path %></a>
+                        <a class="btn dropdown-item" target="_blank" <% path = @netbox_url + "virtualization/virtual-machines/" + vm.id.to_s %><%= link_to "Voir dans Netbox", path %></a>
+                        <a class="btn dropdown-item"<% path = "/" %><%= link_to "Ouvrir Proxmox", path %></a>
+                        <button class="btn btn-primary dropdown-item" data-toggle="modal" data-target="#exampleModal2">Supprimer la VM</button>
+                        <button class="btn btn-secondary dropdown-item " data-toggle="modal" data-target="#exampleModal">Éteindre la VM</button>
+                    </div>
+                </div>
+                <div class="status-vue ">
+                    <% if @status == "running" %>
+                        <h6><strong>Status :</strong> <span class="badge badge-pill badge-success">UP</span></h6>
+                    <% end %>
+                    <% if @status == "stopped" %>
+                        <h6><strong>Status :</strong> <span class="badge badge-pill badge-secondary">STOPPED</span></h6>
+                    <% end %>  
+                    <% if @status == nil %>
+                        <h6><strong>Status :</strong> <span class="badge badge-pill badge-danger">NIL</span></h6>
+                    <% end %>
+                    <pre><%= image_tag("cpu.png", alt: "cpu", class: "conf-logo ")%> <%= vm.vcpus %></pre>
+                    <pre><%= image_tag("ram.png", alt: "ram", class: "conf-logo ")%> <%= vm.memory %> Mo</pre>
+                    <pre><%= image_tag("disk.png", alt: "disk", class: "conf-logo ")%> <%= vm.disk %> Go</pre>
+                    <pre><%= image_tag("node.png", alt: "node", class: "conf-logo ")%> <%= vm[:custom_fields].to_h[@cf_node] %></pre>
+                    <% if vm[:platform].to_h["name"].include? "Debian" %>
+                        <pre><%= image_tag("debian.png", alt: "os", class: "conf-logo")%> <%= vm[:platform].to_h["name"] %></pre>
+                    <% elsif vm[:platform].to_h["name"].include? "FreeBSD" %>
+                        <pre><%= image_tag("freebsd.png", alt: "os", class: "conf-logo")%> <%= vm[:platform].to_h["name"] %></pre>
+                    <% else %>
+                        <pre> <%= vm[:platform].to_h["name"] %></pre>
+                    <% end %>
+                    <pre><%= image_tag("ip.png", alt: "ip", class: "conf-logo ")%> <%= vm[:primary_ip4].to_h["address"] %> <%=  vm[:primary_ip6].to_h["address"]%></pre>
+                    <pre><%= image_tag("saltstack.png", alt: "salt-minion", class: "svc-logo ")%> Rôle : <%= vm[:custom_fields].to_h[@cf_roles]["label"]%></span></pre>
+
+                    <% if @mmonit_enabled == true %>
+                    <h6><strong>Services</strong></h6>
+                    <% mmonit_services = get_mmonit_status(vm.id)%>
+                    <% if mmonit_services != nil %>
+
+                            <% for service in mmonit_services %>
+                                <% if service["type"] == "Process" %>
+                                    <% if service["status"] == "OK" %>
+                                        <% if service["name"] == "sshd" %>
+                                        <pre><%= image_tag("ssh.png", alt: "sshd", class: "svc-logo ")%> <span class="badge badge-pill badge-success"><%= service["status"] %></span></pre>
+                                        <%end%>
+                                        <% if service["name"] == "nginx" %>
+                                        <pre><%= image_tag("nginx.png", alt: "nginx", class: "svc-logo ")%> <span class="badge badge-pill badge-success"><%= service["status"] %></span></pre>
+                                        <%end%>
+                                        <% if service["name"] == "netdata" %>
+                                        <pre><%= image_tag("netdata.png", alt: "netdata", class: "svc-logo ")%> <span class="badge badge-pill badge-success"><%= service["status"] %></span></pre>
+                                        <%end%>
+
+                                        <% if service["name"] == "monit" %>
+                                        <pre><%= image_tag("monit.png", alt: "monit", class: "svc-logo ")%> <span class="badge badge-pill badge-success"><%= service["status"] %></span></pre>
+                                        <%end%>
+
+                                        <% if service["name"] == "salt-minion" %>
+                                        <pre><%= image_tag("saltstack.png", alt: "salt-minion", class: "svc-logo ")%> <span class="badge badge-pill badge-success"><%= service["status"] %></span></pre>
+                                        <%end%> 
+                                    
+                                        
+                                    <% elsif service["status"] == "Does not exist"%>
+                                        <pre><%= service["name"] %>  : <span class="badge badge-pill badge-danger"><%= service["status"] %></span></pre>
+
+                                    <% else %>
+                                        <pre><%= service["name"] %>  : <span class="badge badge-pill badge-secondary"><%= service["status"] %></span></pre>
+
+                                    <% end %>
+                                <% end %>     
+                                <% end %>     
+                        <% end %>   
+                    <% end %>
+                </div>
+            </div>
+            <!--container specs and services -->
+            <div class="container">
+                <!--container Netdata charts-->
+                <div class="row">
+               
+<%= javascript_pack_tag 'google-charts.js' %>
+    <ntl-gchart chart-type="line"                                                                                                                                                                                 
+      data='<%= @netdata_url %>/<%= vm.name %>/api/v1/data?after=-600&format=datatable&points=100&chart=system.cpu' 
+      refresh-timeout="2"                                                                                                                                                                                           
+      options='{                                                                                                                                                                                                    
+            "title":"System CPU",                                                                                                                                                                        
+            "vAxis": { "title": "Values", "minValue": 0},                                                                                                                                                           
+            "legend": { "position": "right"},                                                                                                                                                                       
+            "height": 300,                                                                                                                                                                                          
+            "width": "1000",                                                                                                                                                                                         
+            "isStacked": "absolute",                                                                                                                                                                                
+            "bar": { "groupWidth": "75%" }                                                                                                                                                                          
+          }'></ntl-gchart>    
+    <ntl-gchart chart-type="line"                                                                                                                                                                                 
+      data='<%= @netdata_url %>/<%= vm.name %>/api/v1/data?after=-600&format=datatable&points=100&chart=system.load' 
+      refresh-timeout="2"                                                                                                                                                                                           
+      options='{                                                                                                                                                                                                    
+            "title":"System Load",                                                                                                                                                                        
+            "vAxis": { "title": "Values", "minValue": 0},                                                                                                                                                           
+            "legend": { "position": "right"},                                                                                                                                                                       
+            "height": 300,                                                                                                                                                                                          
+            "width": "1000",                                                                                                                                                                                         
+            "isStacked": "absolute",                                                                                                                                                                                
+            "bar": { "groupWidth": "75%" }                                                                                                                                                                          
+          }'></ntl-gchart>
+    <ntl-gchart chart-type="line"                                                                                                                                                                                 
+      data='<%= @netdata_url %>/<%= vm.name %>/api/v1/data?after=-600&format=datatable&points=100&chart=system.ram' 
+      refresh-timeout="2"                                                                                                                                                                                           
+      options='{                                                                                                                                                                                                    
+            "title":"System RAM",                                                                                                                                                                        
+            "vAxis": { "title": "Values", "minValue": 0},                                                                                                                                                           
+            "legend": { "position": "right"},                                                                                                                                                                       
+            "height": 300,                                                                                                                                                                                          
+            "width": "1000",                                                                                                                                                                                         
+            "isStacked": "absolute",                                                                                                                                                                                
+            "bar": { "groupWidth": "75%" }                                                                                                                                                                          
+          }'></ntl-gchart>
+    <ntl-gchart chart-type="line"                                                                                                                                                                                 
+      data='<%= @netdata_url %>/<%= vm.name %>/api/v1/data?after=-600&format=datatable&points=100&chart=system.net' 
+      refresh-timeout="2"                                                                                                                                                                                           
+      options='{                                                                                                                                                                                                    
+            "title":"System Network",                                                                                                                                                                        
+            "vAxis": { "title": "Values", "minValue": 0},                                                                                                                                                           
+            "legend": { "position": "right"},                                                                                                                                                                       
+            "height": 300,                                                                                                                                                                                          
+            "width": "1000",                                                                                                                                                                                         
+            "isStacked": "absolute",                                                                                                                                                                                
+            "bar": { "groupWidth": "75%" }                                                                                                                                                                          
+          }'></ntl-gchart> 
+    <ntl-gchart chart-type="line"                                                                                                                                                                                 
+      data='<%= @netdata_url %>/<%= vm.name %>/api/v1/data?after=-600&format=datatable&points=100&chart=system.io' 
+      refresh-timeout="2"                                                                                                                                                                                           
+      options='{                                                                                                                                                                                                    
+            "title":"System IO",                                                                                                                                                                        
+            "vAxis": { "title": "Values", "minValue": 0},                                                                                                                                                           
+            "legend": { "position": "right"},                                                                                                                                                                       
+            "height": 300,                                                                                                                                                                                          
+            "width": "1000",                                                                                                                                                                                         
+            "isStacked": "absolute",                                                                                                                                                                                
+            "bar": { "groupWidth": "75%" }                                                                                                                                                                          
+          }'></ntl-gchart>                               
+
+                     
+                </div>   
+            </div> 
+            <!-- Alert -->
+            <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">
+                                <b>Êtes-vous sûr de vouloir éteindre la VM ?</b>
+                            </h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            Merci de confirmer l'exctinction de
+                            <b><%= vm.name %></b>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+                            <% path = "/show/stop/" + vm.id.to_s %>
+                            <%= link_to("Éteindre", path, method: :get, class: "delete_button btn btn-large btn-secondary") %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade" id="exampleModal2" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">
+                                <b>Êtes-vous sûr de vouloir supprimer la VM ?</b>
+                            </h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            Merci de confirmer la suppressions de 
+                            <b><%= vm.name %></b>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+                            <%= link_to("Supprimer", '', method: :delete, class: "delete_button btn btn-large btn-primary") %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    <% end %>
+<% end %>
+<%= link_to "Retour", :back, class:"btn btn-primary" %>
+
+

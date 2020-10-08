@@ -1,0 +1,35 @@
+<h2>Ajouter une note</h2>
+
+<div class="form-group">
+    <%= form_with scope: :note, url: notes_path, local: true do |form| %>
+
+    <% if @note.errors.any? %>
+    <div id="error_explanation">
+        <h4>
+            <%= pluralize(@note.errors.count, "erreurs") %> empêchent cette note d'être enregistré.
+        </h4>
+        <ul>
+            <% @note.errors.full_messages.each do |msg| %>
+            <li><%= msg %></li>
+            <% end %>
+        </ul>
+    </div>
+    <% end %>
+
+    <div class="field">
+        <%= form.label :Titre %><br>
+        <%= form.text_field :title, class: "form-control" %>
+    </div>
+
+    <div class="field">
+        <%= form.label :Message %><br>
+        <%= form.text_area :text, class: "form-control", rows: "8"   %>
+    </div>
+
+    <div class="field">
+        <%= form.submit "Ajouter", :class => "btn btn-large btn-primary"%>
+        <%= link_to 'Retour', notes_path, class:"btn btn-primary" %>
+    </div>
+    <% end %>
+
+</div>

@@ -1,0 +1,99 @@
+<h2>Modifier l'utilisateur</h2>
+<div class="form-group">
+    <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put }) do |f| %>
+    <%= render "devise/shared/error_messages", resource: resource %>
+
+    <br>
+
+    <h3>Tokens</h3>
+    <div class="form-group">
+        <div class="field form-label-group">
+            <%= f.text_field :netbox_token, autocomplete: "netbox_token", class: "form-control" %>
+            <label for="inputTokenNetbox">Netbox</label>
+            
+    </div>
+    <div class="form-group">
+        <div class="field form-label-group">
+            <%= f.text_field :rundeck_token,  class: "form-control" %>
+            <label for="inputTokenRundeck">Rundeck</label>
+        
+    </div>
+
+    <hr>
+
+    <h3>Proxmox</h3>
+    <div class="form-group">
+        <div class="field form-label-group">
+            <%= f.text_field :proxmox_user, autocomplete: "proxmox_user",  class: "form-control" %>
+            <label for="inputUserProxmox">Utilisateur</label>
+            
+    </div>
+    <div class="form-group">
+        <div class="field form-label-group">
+            <%= f.password_field :proxmox_password,  class: "form-control" %>
+            <label for="inputPasswordProxmox">Mot de passe</label>
+            
+    </div>
+
+    <h3>M/Monit</h3>
+    <div class="form-group">
+        <div class="field form-label-group">
+            <%= f.text_field :mmonit_username, autocomplete: "mmonit_user",  class: "form-control" %>
+            <label for="inputUserMmonit">Utilisateur</label>
+        
+    </div>
+    <div class="form-group">
+        <div class="field form-label-group">
+            <%= f.password_field :mmonit_password,  class: "form-control" %>
+            <label for="inputPasswordMmonit">Mot de passe</label>
+        
+    </div>
+
+    <hr>
+
+    <h3>Utilisateur</h3>
+
+    <div class="form-group">
+        <div class="field form-label-group">
+            <%= f.email_field :email, autofocus: true, autocomplete: "email", class: "form-control"  %>
+            <label for="inputEmail">E-mail</label>
+        </div>
+
+    <% if devise_mapping.confirmable? && resource.pending_reconfirmation? %>
+    <div>En attente de confirmation : <%= resource.unconfirmed_email %></div>
+    <% end %>
+
+    <div class="form-group">
+        <div class="field form-label-group">
+        <%= f.password_field :password, class: "form-control" %>
+        <label for="inputNewPassword">Nouveau mot de passe (laisser en blanc si vous ne voulez pas le changer)</label>
+    </div>
+    <div class="form-group">
+        <div class="field form-label-group">
+          <%= f.password_field :password, class: "form-control"   %>
+          <label for="inputPasswordCheck">Confirmation du nouveau mot de passe
+          <% if @minimum_password_length %>
+        <em>(<%= @minimum_password_length %> characters minimum)</em>
+        <% end %></label>
+        </div>
+    <hr>
+    <h3>Confirmation</h3>
+    <div class='form-group'>
+        <div class="field form-label-group">
+        <%= f.password_field :current_password, autocomplete: "current-password", class: "form-control" %>
+        <label for="inputCurrentPassword">Mot de passe actuel (Pour confirmer vos changements)
+    </div>
+
+    <div class="actions">
+        <%= f.submit "Mise à jour", class: "btn btn-large btn-primary" %>
+    </div>
+    <% end %>
+    <br>
+    <hr>
+    <h3>Supprimer mon compte</h3>
+    </br>
+    <%= button_to "Supprimer", registration_path(resource_name), data: { confirm: "En êtes-vous sûr ?" }, method: :delete, class: "btn btn-large btn-warning" %>
+    </br>
+    <hr>
+    <%= link_to "Retour", :back, class:"btn btn-primary" %>
+</div>

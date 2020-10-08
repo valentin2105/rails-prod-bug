@@ -1,0 +1,21 @@
+<p>
+    <strong>Title:</strong>
+    <%= @note.title %>
+</p>
+
+<p>
+    <strong>Date:</strong>
+    <%= @note.created_at %>
+</p>
+
+<p>
+    <strong>Author:</strong>
+    <%= @note.author %>
+</p>
+
+<p>
+    <strong>Text:</strong>
+    <%= @note.text %>
+</p>
+
+<%= link_to 'Retour', notes_path, class:"btn btn-primary"%>

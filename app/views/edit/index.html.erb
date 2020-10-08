@@ -1,0 +1,94 @@
+<h2>Modifier une Machine Virtuelle</h2>
+<% if (@cluster_name != nil) %>
+<h3>
+        <pre>Sur le cluster <%= @cluster_name %></pre>
+</h3>
+
+<%= debug @vm %>
+
+<% saltRolesRaw = "" %>
+<% if (@saltRoles != nil) %>
+    <% roles =  @saltRoles.to_h %>
+    <% roles.each do |key, value| %>
+        <% saltRolesRaw = saltRolesRaw + '<option value="' + value.to_s + '">' + key + '</option>' %>
+    <% end %>   
+<%end%>
+
+<% proxmoxPoolRaw = "" %>
+<% if (@ProxmoxPool != nil) %>
+    <% roles =  @ProxmoxPool.to_h %>
+    <% roles.each do |key, value| %>
+        <% proxmoxPoolRaw = proxmoxPoolRaw + '<option value="' + value.to_s + '">' + key + '</option>' %>
+    <% end %>   
+<%end%>
+
+    <hr>
+
+    <%= form_tag('/edit') do -%>
+
+    <% nodeStr = "" %>
+    <% nodes = get_nodes() %>
+    <% if (nodes != nil)  then %>
+        <% for node in nodes %>
+                <% nodeStr = nodeStr + '<option value="' + node.to_h["node"] + '">' + node.to_h["node"] + '</option>' %>
+        <% end %>   
+        <div class="form-group">
+            <p> Nom : <%= text_field_tag(:name, @vm.name, size: "55x1", class: "form-control") %> </p>
+            <p> vCPUs : <%= select_tag(:vcpus, raw('
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="4">4</option>
+            <option value="8">8</option>'), class: "form-control") %></p>
+            <p> RAM : <%= select_tag(:ram, raw('
+            <option value="1024">1Go</option>
+            <option value="2048">2Go</option>
+            <option value="4096">4Go</option>
+            <option value="8192">8Go</option>'), class: "form-control") %> </p>
+            <p> Disque : <%= select_tag(:disk, raw('
+            <option value="10">10Go</option>
+            <option value="15">15Go</option>
+            <option value="20">20Go</option>
+            <option value="25">25Go</option>
+            <option value="50">50Go</option>
+            <option value="100">100Go</option>'), class: "form-control") %></p> 
+            <p> Node de destination : <%= select_tag(:node, raw(nodeStr), class: "form-control") %> </p>
+
+            <% if @ipv4Enabled == true then %>
+
+                <% if @defaultStack == 4 %>
+                    <p> IPv4 CIDR : <%= text_field_tag(:IPv4CIDR, "192.168.42.42/32", size: "55x1", class: "form-control") %> </p>
+                    <% if @ipv6Enabled == true %>
+                        <p> IPv6 interface : <%= select_tag(:IPv6Interface, raw('
+                        <option value="False">False</option>
+                        <option value="True">True</option>'), class: "form-control") %> </p>
+                        <p> IPv6 CIDR : <%= text_field_tag(:IPv6CIDR, "fd09:fc48:0781:a839::/64", size: "55x1", class: "form-control") %> </p>
+                    <% end %>
+                <% end %>
+
+                <% if @defaultStack == 6 %>
+                    <p> IPv4 interface : <%= select_tag(:IPv4Interface, raw('
+                    <option value="False">False</option>
+                    <option value="True">True</option>'), class: "form-control") %> </p>
+                    <p> IPv4 CIDR : <%= text_field_tag(:IPv4CIDR, "192.168.42.42/32", size: "55x1", class: "form-control") %> </p>
+                <% end %>
+
+
+            <% end %>
+
+            <p> Pool Proxmox:  <%= select_tag(:proxmoxpool, raw(proxmoxPoolRaw), class: "form-control") %> </p>
+            <p> Tag de rôle Salt:  <%= select_tag(:saltrole, raw(saltRolesRaw), class: "form-control") %> </p>
+        </div>
+
+        <div><%= submit_tag 'Créer', class: "btn btn-large btn-primary"%></div>
+        </div>
+    <%else%>
+        <br>
+        <h4>Vous devez pouvoir vous connecter à Proxmox pour créer une machine.</h4>
+    <% end %>
+
+<% end %>
+
+<%else%>
+    <br>
+    <h4>Vous devez pouvoir vous connecter à Netbox pour créer une machine.</h4>
+<%end%>

@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang=fr>
+        <%= render 'layouts/header' %>
+        <main role="main multiple-scenes view-control-buttons">
+            <section class=content>
+                <section class=" ruban-sauron page">
+                <%= render 'layouts/alerts' %>            
+                <%= yield %>                    
+                </section>
+                <section class=" cta py-50 text-center text-lg-left" style=background-image:url(/images/home/bkg_cta.png)>
+                </section>
+            </section>
+        </main>
+        <%= render 'layouts/footer' %>        
+</body>
+</html>

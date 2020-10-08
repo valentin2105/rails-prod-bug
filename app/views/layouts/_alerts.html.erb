@@ -1,0 +1,20 @@
+                <% unless flash.empty? %>
+                    <% flash.each do |key, value| %>
+                        <% type = key.to_s.gsub('alert', 'error').gsub('notice', 'info').gsub('created', 'success').gsub('deleted', 'info') %>
+                        <span data-popup-message data-message="<%= value %>" data-type="<%= type %>"></span>                            
+                        <% if key == "created" %>
+                            <div class="center">
+                                <a target="_blank" href="<%= @gitlabUrl %>">
+                                    <button type="button" class="btn btn-secondary">Déployer</button>
+                                </a>
+                            </div>
+                        <% end %>
+                        <% if key == "deleted" %>
+                            <div class="center">
+                                <a target="_blank" href="<%= @gitlabUrl %>">
+                                    <button type="button" class="btn btn-secondary">Déployer</button>
+                                </a>
+                            </div>
+                        <% end %>                        
+                    <% end %>
+                <% end %>

@@ -1,0 +1,45 @@
+default: &default
+  # Global
+  HOST_DOMAIN: "sauron.domain.tld"
+  DEFAULT_STACK: 4
+  ENABLE_IPV6: True
+  ENABLE_IPV4: True
+  # Proxmox
+  PROXMOX_URL: "proxmox.webui.domain.tld"
+  PROXMOX_LOGIN_TYPE: "pve"
+  # Netbox
+  NETBOX_API_URL: "https://netbox.domain.tld/api/"
+  NETBOX_URL: "https://netbox.domain.tld/"
+  NETBOX_VM_CLUSTER_ID: "3"
+  NETBOX_VM_ROLE_ID: "10"
+  NETBOX_VM_TENANT_ID: "None"
+  NETBOX_NODE_CF: "proxmoxnode"
+  NETBOX_POOL_CF: "proxmoxpool"
+  NETBOX_PVEVMID_CF: "proxmoxvmid"
+  NETBOX_ROLES_CF: "saltrole"
+  NETBOX_OSTEMPLATE_DESC: "proxmox-os"
+  # Rundeck
+  RUNDECK_URL: "https://rundeck.domain.tld"
+  RUNDECK_TERRAFORMGEN_JOBID: "job-uuid"
+  # Gitlab Terraform-repo URL
+  GITLAB_CI_URL: "https://gitlab.com/TerraformRepo/pipelines/latest"
+  # Network configurations
+  DEFAULT_INTERFACE: "eth0"
+  SECONDARY_INTERFACE: "eth1"
+  IPV6_VLAN: "4042"
+  IPV4_VLAN: "4064"
+  CLUSTER_IPV6_PREFIX: ""
+  CLUSTER_IPV6_MASK: "/64"
+  CLUSTER_MAC_PREFIX: "02:22:22:"
+  # Other services
+  MMONIT_INTEGRATION: False
+  MMONIT_HOST: "mmonit.domain.tld"
+  NETDATA_URL: "https://netdata.domain.tld"
+  OPS_IMG_URL: ""
+  OPS_IMG_HREF: ""
+  
+development:
+  <<: *default
+production:
+  <<: *default
+

@@ -1,0 +1,29 @@
+variables:
+  DOCKER_DRIVER: overlay2
+  DOCKER_HOST: tcp://docker:2375/
+  DOCKER_DRIVER: overlay2
+    # See https://github.com/docker-library/docker/pull/166
+  DOCKER_TLS_CERTDIR: ""
+image: docker:latest
+
+build:
+  stage: build
+  services:
+    - docker:dind
+  script:
+    #- git fetch
+    #- export LATEST_TAG=$(git describe --tags $(git rev-list --tags --max-count=1))
+    #- echo "Let's build $LATEST_TAG"
+    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
+    - docker build --pull -f Dockerfile -t "$IMAGE_NAME:latest" .
+    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
+    - docker push "$IMAGE_NAME:latest"
+  only:
+  - master
+  tags:
+  - gitlab-org-docker
+
+services:
+  - name: docker:dind
+    entrypoint: ["env", "-u", "DOCKER_HOST"]
+    command: ["dockerd-entrypoint.sh"]
